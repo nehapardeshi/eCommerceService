@@ -20,6 +20,16 @@ namespace eCommerceService.Services
             _orderValidators = orderValidators;
         }
 
+        /// <summary>
+        /// Adds an order
+        /// </summary>
+        /// <param name="customerId">Customer Id</param>
+        /// <param name="currencyCode">Currency Code</param>
+        /// <param name="streetAddress">Strret address of the customer</param>
+        /// <param name="postalCode">Postal code of the customer</param>
+        /// <param name="city">City of the customer</param>
+        /// <param name="country">Country of the customer</param>
+        /// <returns>Created Order</returns>
         public async Task<Order> AddOrderAsync(int customerId, string currencyCode, string? streetAddress = null, string? postalCode = null, string? city = null, string? country = null)
         {
             var currentDate = DateTime.Now;
@@ -40,6 +50,16 @@ namespace eCommerceService.Services
             return order;
         }
 
+        /// <summary>
+        /// Updates an order
+        /// </summary>
+        /// <param name="orderId">Order Id</param>
+        /// <param name="streetAddress">Strret address of the customer</param>
+        /// <param name="postalCode">Postal code of the customer</param>
+        /// <param name="city">City of the customer</param>
+        /// <param name="country">Country of the customer</param>
+        /// <returns>Updated Order</returns>
+        /// <exception cref="ECommerceException">Exception returns when order not found with the given Order Id</exception>
         public async Task<Order> UpdateOrderAsync(int orderId, string? streetAddress = null, string? postalCode = null, string? city = null, string? country = null)
         {
             var order = await GetOrderAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
@@ -52,10 +72,20 @@ namespace eCommerceService.Services
             return order;
         }
 
+        /// <summary>
+        /// Adds an order item to an existing order
+        /// </summary>
+        /// <param name="orderId">Order Id</param>
+        /// <param name="productId">Product Id</param>
+        /// <param name="quantity">Product Quantity</param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task<OrderItem> AddOrderItemAsync(int orderId, int productId, int quantity)
         {
             var order = await _ordersRepository.GetOrderFullAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if order is in correct state to add an order item 
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.ChangeInOrderItems) ?? throw new Exception("Ship order validator not found");
             validtor.ValidateOrder(order);
 
@@ -76,7 +106,7 @@ namespace eCommerceService.Services
 
             await _ordersRepository.AddOrderItemAsync(orderItem);
 
-            // Finally, update order amount
+            // Finally, update order total amount
             order.TotalAmount += reservedTotalAmount;
             await _ordersRepository.UpdateOrderAsync(order);
 
@@ -84,10 +114,19 @@ namespace eCommerceService.Services
             return orderItem;
         }
 
+        /// <summary>
+        /// Removes an order item from an order
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <param name="orderItemId"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task RemoveOrderItemAsync(int orderId, int orderItemId)
         {
             var order = await GetOrderAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if an order item can be removed from the order
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.ChangeInOrderItems) ?? throw new Exception("Ship order validator not found");
             validtor.ValidateOrder(order);
 
@@ -108,6 +147,15 @@ namespace eCommerceService.Services
             transactionScope.Complete();
         }
 
+        /// <summary>
+        /// Updates quantity of an order item in an order
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <param name="orderItemId"></param>
+        /// <param name="quantityToUpdate"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task UpdateOrderItemAsync(int orderId, int orderItemId, int quantityToUpdate)
         {
             // If quantityToUpdate is 0, then remove order item
@@ -127,6 +175,7 @@ namespace eCommerceService.Services
                 return;
             }
 
+            // Validate if an order item can be updated
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.ChangeInOrderItems) ?? throw new Exception("Ship order validator not found");
             validtor.ValidateOrder(order);
 
@@ -158,10 +207,18 @@ namespace eCommerceService.Services
             transactionScope.Complete();
         }
 
+        /// <summary>
+        /// Pays an order, marks order as paid
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task PayOrderAsync(int orderId)
         {
             var order = await GetOrderAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if order can be marked as Paid
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.Pay) ?? throw new Exception("Pay order validator not found");
             validtor.ValidateOrder(order);
 
@@ -171,10 +228,18 @@ namespace eCommerceService.Services
             await _ordersRepository.UpdateOrderAsync(order);
         }
 
+        /// <summary>
+        /// Ships an order, markes order as shipped
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task ShipOrderAsync(int orderId)
         {
             var order = await _ordersRepository.GetOrderFullAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if order can be marked as Shipped
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.Ship) ?? throw new Exception("Ship order validator not found");
             validtor.ValidateOrder(order);
 
@@ -194,10 +259,18 @@ namespace eCommerceService.Services
             transactionScope.Complete();
         }
 
+        /// <summary>
+        /// Delivers an order, marks order as delivered
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task DeliverOrderAsync(int orderId)
         {
             var order = await GetOrderAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if order can be marked as Delivered
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.Deliver) ?? throw new Exception("Pay order validator not found");
             validtor.ValidateOrder(order);
 
@@ -207,10 +280,18 @@ namespace eCommerceService.Services
             await _ordersRepository.UpdateOrderAsync(order);
         }
 
+        /// <summary>
+        /// Cancels an order, marks order as cancelled
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        /// <exception cref="ECommerceException"></exception>
+        /// <exception cref="Exception"></exception>
         public async Task CancelOrderAsync(int orderId)
         {
             var order = await GetOrderAsync(orderId) ?? throw new ECommerceException(ErrorCode.NotFound(typeof(Order), orderId));
 
+            // Validate if order can be marked as Cancelled
             var validtor = _orderValidators.SingleOrDefault(v => v.OrderAction == OrderAction.Cancel) ?? throw new Exception("Pay order validator not found");
             validtor.ValidateOrder(order);
 
@@ -220,7 +301,18 @@ namespace eCommerceService.Services
             await _ordersRepository.UpdateOrderAsync(order);
         }
 
+        /// <summary>
+        /// Gets order by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Order> GetOrderAsync(int id) => await _ordersRepository.GetOrderAsync(id);
+
+        /// <summary>
+        /// Gets order details by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Order> GetOrderFullAsync(int id) => await _ordersRepository.GetOrderFullAsync(id);
     }
 }

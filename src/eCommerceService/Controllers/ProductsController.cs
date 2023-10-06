@@ -21,6 +21,11 @@ namespace eCommerceService.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get all products or filtered by search text
+        /// </summary>
+        /// <param name="searchText">Search Text which is optional</param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<Models.Product>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
@@ -31,6 +36,11 @@ namespace eCommerceService.Controllers
             return Ok(productResponse);
         }
 
+        /// <summary>
+        /// Gets a product
+        /// </summary>
+        /// <param name="productId">Product Id</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{product-id}")]
         [ProducesResponseType(typeof(Models.Product), (int)HttpStatusCode.OK)]
@@ -42,6 +52,11 @@ namespace eCommerceService.Controllers
             return Ok(productResponse);
         }
 
+        /// <summary>
+        /// Adds a product
+        /// </summary>
+        /// <param name="request">CreateProductRequest</param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(Models.Product), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
@@ -54,6 +69,12 @@ namespace eCommerceService.Controllers
             return Ok(productResponse);
         }
 
+        /// <summary>
+        /// Updates a product
+        /// </summary>
+        /// <param name="productId">Product Id</param>
+        /// <param name="request">UpdateProductRequest</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("{product-id}")]
         [ProducesResponseType(typeof(Models.Product), (int)HttpStatusCode.OK)]
@@ -67,6 +88,11 @@ namespace eCommerceService.Controllers
             return Ok(productResponse);
         }
 
+        /// <summary>
+        /// Deletes a product. It will soft delete a product marking it as inactive
+        /// </summary>
+        /// <param name="productId">Product Id</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{product-id}")]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]

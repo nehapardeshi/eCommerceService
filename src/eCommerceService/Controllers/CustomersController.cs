@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using eCommerceService.Models;
-using eCommerceService.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,6 +20,11 @@ namespace eCommerceService.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Gets customer by given customer id
+        /// </summary>
+        /// <param name="customerId">Customer Id</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{customer-id}")]
         [ProducesResponseType(typeof(Models.Customer), (int)HttpStatusCode.OK)]
@@ -32,6 +36,11 @@ namespace eCommerceService.Controllers
             return Ok(customerResponse);
         }
 
+        /// <summary>
+        /// Gets all customer or filtered by given search text
+        /// </summary>
+        /// <param name="searchText">Search text which is optional</param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<Models.Customer>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
@@ -42,6 +51,11 @@ namespace eCommerceService.Controllers
             return Ok(customerResponse);
         }
 
+        /// <summary>
+        /// Adds a customer
+        /// </summary>
+        /// <param name="request">CreateCustomerRequest</param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(Models.Customer), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
@@ -53,6 +67,12 @@ namespace eCommerceService.Controllers
             return Ok(customerResponse);
         }
 
+        /// <summary>
+        /// Updates a customer
+        /// </summary>
+        /// <param name="customerId">Customer Id</param>
+        /// <param name="request">UpdateCustomerRequest</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("{customer-id}")]
         [ProducesResponseType(typeof(Models.Customer), (int)HttpStatusCode.OK)]
@@ -65,6 +85,11 @@ namespace eCommerceService.Controllers
             return Ok(customerResponse);
         }
 
+        /// <summary>
+        /// Deletes a customer. It will soft delete a customer marking it as inactive
+        /// </summary>
+        /// <param name="customerId">Customer Id</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{customer-id}")]
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]

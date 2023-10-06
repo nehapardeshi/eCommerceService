@@ -21,10 +21,6 @@ namespace eCommerceService.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        [Route("test")]
-        public IActionResult Get() => Ok("This is a demo message from the API");
-        
 
         /// <summary>
         /// Creates new order

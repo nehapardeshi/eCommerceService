@@ -10,7 +10,12 @@ namespace eCommerceService.Services.Validators
         public override bool Validate(Order order)
         {
             if (order.OrderStatus != OrderStatus.Draft)
-                throw new ECommerceException(ErrorCode.OrderAlreadyPaid, $"Cannot add/update or remove order item to already paid order id {order.Id}");
+            {
+                if (order.OrderStatus == OrderStatus.Cancelled)
+                    throw new ECommerceException(ErrorCode.OrderAlreadyCancelled, $"Cannot add/update or remove order item to already cancelled order id {order.Id}");
+                else
+                    throw new ECommerceException(ErrorCode.OrderAlreadyPaid, $"Cannot add/update or remove order item to already paid order id {order.Id}");
+            }
 
             return true;
         }

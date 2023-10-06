@@ -61,8 +61,8 @@ namespace eCommerceService.Services
                 throw new ECommerceException(ErrorCode.ProductQuantityNotAvailable, $"Requested product quantity not available. Requested quantity to reserve: {quantityToReserve}, Available quantity: {product.AvailableQuantity}");
             }
 
-            product.AvailableQuantity -= quantityToReserve;
-            product.ReservedQuantity += quantityToReserve;
+            product.AvailableQuantity -= quantityToReserve; // Decrease avaiable quantity
+            product.ReservedQuantity += quantityToReserve; // Increase reserved quantity
 
             await _productsRepository.UpdateProductAsync(product);
 
@@ -73,8 +73,8 @@ namespace eCommerceService.Services
         public async Task<decimal> UnreserveProductAsync(int productId, int quantityToUnreserve)
         {
             var product = await GetProductAsync(productId);
-            product.AvailableQuantity += quantityToUnreserve;
-            DecreaseReservedQuantity(quantityToUnreserve, product);
+            product.AvailableQuantity += quantityToUnreserve; // Increase available quantity
+            DecreaseReservedQuantity(quantityToUnreserve, product); 
 
             await _productsRepository.UpdateProductAsync(product);
 
@@ -102,6 +102,7 @@ namespace eCommerceService.Services
         {
             product.ReservedQuantity -= quantityToDecrease;
 
+            // Set reserved quantity as 0 when negative
             if (product.ReservedQuantity < 0)
                 product.ReservedQuantity = 0;
         }
