@@ -29,14 +29,14 @@ namespace eCommerceService.Repositories
 
             searchText = searchText.ToLower();
             return _dbContext.Customers
-                .Where(p => p.FirstName.ToLower().Contains(searchText) ||
-                p.FirstName.ToLower().Contains(searchText) ||
-                p.Email.ToLower().Contains(searchText) ||
-                p.Phone.ToLower().Contains(searchText) ||
-                p.StreetAddress.ToLower().Contains(searchText) ||
-                p.PostalCode.ToLower().Contains(searchText) ||
-                p.City.ToLower().Contains(searchText) ||
-                p.Country.ToLower().Contains(searchText)
+                .Where(customer => customer.FirstName.ToLower().Contains(searchText) ||
+                customer.LastName.ToLower().Contains(searchText) ||
+                customer.Email.ToLower().Contains(searchText) ||
+                customer.Phone.ToLower().Contains(searchText) ||
+                customer.StreetAddress.ToLower().Contains(searchText) ||
+                customer.PostalCode.ToLower().Contains(searchText) ||
+                customer.City.ToLower().Contains(searchText) ||
+                customer.Country.ToLower().Contains(searchText)
                 ).ToList();
         }
 

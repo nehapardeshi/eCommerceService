@@ -32,7 +32,7 @@ namespace eCommerceService.Controllers
         [ProducesResponseType(typeof(Error), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> AddOrderAsync([FromBody] CreateOrderRequest request)
         {
-            var createdOrder = await _orderService.AddOrderAsync(request.CustomerId, request.CurrencyCode);
+            var createdOrder = await _orderService.AddOrderAsync(request.CustomerId, request.CurrencyCode, request.StreetAddress, request.PostalCode, request.City, request.Country);
             var orderItems = new List<Entities.OrderItem>();
             if (request.OrderItems.Any())
             {
@@ -45,7 +45,6 @@ namespace eCommerceService.Controllers
 
             // Fetch order with refreshed total amount values
             var orderResponse = _mapper.Map<Entities.Order, Models.Order>(await _orderService.GetOrderAsync(createdOrder.Id));
-            orderResponse.OrderItems.AddRange(_mapper.Map<List<Entities.OrderItem>, List<Models.OrderItem>>(orderItems));
 
             _logger.LogInformation($"Order created with Id: {createdOrder.Id}");
             return Ok(orderResponse);
